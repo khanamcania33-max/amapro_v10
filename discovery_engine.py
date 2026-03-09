@@ -4,7 +4,7 @@ import pandas as pd
 def discover_products(keywords):
     rows=[]
     for k in keywords:
-        products = search_amazon_products(k, max_results=1)
+        products = search_amazon_products(k, max_results=3)
         for p in products:
             rows.append({
                 "Niche": k,
