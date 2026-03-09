@@ -6,23 +6,25 @@ from sklearn.cluster import KMeans
 from keyword_engine import generate_keywords
 from discovery_engine import discover_products
 from scoring_engine import score_product
-from profit_engine import profit_simulation
+from profit_engine import profit_sim
 
-st.set_page_config(page_title="AMAPRO v9 QUANTUM AI", layout="wide")
+st.set_page_config(page_title="AMAPRO v10 AI ENGINE",layout="wide")
 
-st.title("🚀 AMAPRO v9 — QUANTUM AMAZON RESEARCH AI")
+st.title("🚀 AMAPRO v10 — FULL AI AMAZON BUSINESS ENGINE")
 
-# Sidebar
+# sidebar
 
 st.sidebar.header("Discovery Settings")
 
-keyword_count = st.sidebar.slider("Keywords to Scan",100,1000,300)
+keyword_count = st.sidebar.slider("Niches to Scan",100,1000,300)
 
 min_price = st.sidebar.slider("Minimum Price",40,200,40)
 
 max_reviews = st.sidebar.slider("Maximum Reviews",50,500,200)
 
-if st.sidebar.button("Run Quantum Scan"):
+run = st.sidebar.button("Run AI Scan")
+
+if run:
 
     keywords = generate_keywords(keyword_count)
 
@@ -30,30 +32,34 @@ if st.sidebar.button("Run Quantum Scan"):
 
     df["Opportunity Score"] = df.apply(score_product,axis=1)
 
-    profits = []
-    margins = []
+    profits=[]
+    margins=[]
 
-    for p in df["price"]:
+    for p in df["Price"]:
 
-        pr,mg = profit_simulation(p)
+        pr,mg = profit_sim(p)
 
         profits.append(pr)
-
         margins.append(mg)
 
-    df["profit"] = profits
-    df["margin"] = margins
+    df["Profit $"] = profits
+    df["Margin %"] = margins
 
-    # AI niche clustering
-    features = df[["price","monthly_sales","reviews"]]
+    # Amazon search link
+
+    df["Amazon Link"] = "https://www.amazon.com/s?k=" + df["Niche"].str.replace(" ","+")
+
+    # niche clustering
+
+    features = df[["Price","Monthly Sales","Reviews"]]
 
     model = KMeans(n_clusters=6,n_init=10)
 
-    df["niche_cluster"] = model.fit_predict(features)
+    df["Cluster"] = model.fit_predict(features)
 
     filtered = df[
-    (df["price"] >= min_price) &
-    (df["reviews"] <= max_reviews)
+    (df["Price"]>=min_price)&
+    (df["Reviews"]<=max_reviews)
     ]
 
     filtered = filtered.sort_values("Opportunity Score",ascending=False)
@@ -62,23 +68,42 @@ if st.sidebar.button("Run Quantum Scan"):
 
     winners = filtered.head(100)
 
-    st.dataframe(winners)
+    st.dataframe(
+        winners,
+        column_config={
+        "Amazon Link":st.column_config.LinkColumn("Amazon",display_text="Search")
+        },
+        use_container_width=True
+    )
+
+    # charts
 
     st.subheader("Opportunity Map")
 
     fig = px.scatter(
         filtered,
-        x="reviews",
-        y="revenue",
-        size="monthly_sales",
+        x="Reviews",
+        y="Revenue",
+        size="Monthly Sales",
         color="Opportunity Score",
-        hover_name="keyword"
+        hover_name="Niche"
     )
 
     st.plotly_chart(fig)
 
-    st.subheader("Opportunity Distribution")
+    st.subheader("Opportunity Score Distribution")
 
     fig2 = px.histogram(filtered,x="Opportunity Score")
 
     st.plotly_chart(fig2)
+
+    # CSV DOWNLOAD (GOOGLE SHEETS READY)
+
+    csv = winners.to_csv(index=False).encode()
+
+    st.download_button(
+    "📥 Download Google Sheets CSV",
+    csv,
+    "amapro_v10_opportunities.csv",
+    "text/csv"
+    )
