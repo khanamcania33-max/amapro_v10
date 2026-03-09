@@ -1,22 +1,22 @@
 import random
 
-base_keywords = [
-"dog","cat","fitness","kitchen","camping","travel",
-"desk","home","garden","bike","coffee","pet"
+base = [
+"dog","cat","coffee","desk","garden","bike",
+"camping","fitness","kitchen","travel","pet"
 ]
 
-modifiers = [
-"holder","rack","organizer","kit","stand","bag",
-"table","seat","feeder","light","cart","machine"
+mods = [
+"holder","organizer","rack","stand","cart",
+"kit","table","seat","bag","machine","feeder"
 ]
 
 def generate_keywords(n=300):
 
-    keywords = []
+    keywords=[]
 
     for i in range(n):
 
-        k = random.choice(base_keywords) + " " + random.choice(modifiers)
+        k=random.choice(base)+" "+random.choice(mods)
 
         keywords.append(k)
 
