@@ -1,15 +1,15 @@
-def profit_simulation(price):
+def profit_sim(price):
 
-    cost = price * 0.25
+    cost = price*0.25
 
     shipping = 4
 
-    fba_fee = price * 0.15
+    fba = price*0.15
 
-    ppc = price * 0.10
+    ppc = price*0.10
 
-    profit = price - (cost + shipping + fba_fee + ppc)
+    profit = price-(cost+shipping+fba+ppc)
 
-    margin = profit / price
+    margin = profit/price
 
     return round(profit,2), round(margin*100,1)
